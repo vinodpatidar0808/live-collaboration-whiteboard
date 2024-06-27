@@ -4,7 +4,7 @@ function App() {
 
   return (
     <>
-      <main>Hello white board</main>
+      <main className="">Hello white board</main>
     </>
   )
 }
