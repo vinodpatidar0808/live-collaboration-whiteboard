@@ -1,20 +1,23 @@
-import { useState } from 'react'
+import { useState } from 'react';
 
 import Canvas from "./components/Canvas"
 import Toolbar from "./components/Toolbar";
 
-// styles 
+// styles
 import './App.css'
 
 function App() {
   const [selectedTool, setSelectedTool] = useState("line");
   return (
-    <div className="h-screen w-full flex flex-col items-center gap-4  ">
+    <div className="h-screen w-full bg-gray-300 flex flex-col items-center gap-4  ">
       <main className="text-3xl font-bold">Hello white board</main>
-      <Toolbar setSelectedTool={setSelectedTool} selectedTool={selectedTool} />
+      <Toolbar
+        setSelectedTool={setSelectedTool}
+        selectedTool={selectedTool}
+      />
       <Canvas selectedTool={selectedTool} />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
