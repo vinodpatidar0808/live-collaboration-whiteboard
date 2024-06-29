@@ -9,7 +9,6 @@ const generator = rough.generator();
 
 const Canvas = ({ selectedTool }) => {
   const canvasRef = useRef(null);
-  // const [canvasState, setCanvasState] = useState([]);
   const [canvasState, setCanvasState, undo, redo] = useHistory([]);
   const canvasCoordinatesRef = useRef({});
   // selectedElement will hold current element you are working with, this is introduced to loose connecttion when you release mouse button
@@ -47,10 +46,10 @@ const Canvas = ({ selectedTool }) => {
       canvasState.forEach((shape) => {
         drawElement(rc, context, shape);
       });
+      // restores the most recently saved canvas state by popping the top entry in the drawing state stack.
       context.restore();
     }
   }, [canvasState, selectedElement]);
-  // },[])
 
   useEffect(() => {
     const undoRedo = (e) => {
@@ -146,7 +145,7 @@ const Canvas = ({ selectedTool }) => {
 
   const handleMouseMove = (e) => {
     // when you are moving inside canvas without pressing mouse button first, this will throw error when there are no elements in canvasState.
-    if (canvasState.length === 0) return;
+    if (canvasState.length === 0 || !selectedElement) return;
     const { x, y } = getMouseCoordinatesRelativeToCanvas(e);
 
     // get mouse coordinates at each mouse movement, as we will store temporary drawing untill mouse button is released.
@@ -177,12 +176,15 @@ const Canvas = ({ selectedTool }) => {
      * 3. and you stop the mouse and release the mouse button
      * */
 
+    // Learning: width and height you have to provide specifically to canvas else it will take default width and height
     <canvas
       ref={canvasRef}
+      width={"1000px"}
+      height={"500px"}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
-      className=" w-10/12 h-4/6 bg-white shadow-md box-border "></canvas>
+      className=" bg-white shadow-md box-border "></canvas>
   );
 };
 
