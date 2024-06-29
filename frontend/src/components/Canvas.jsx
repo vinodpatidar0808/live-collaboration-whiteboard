@@ -4,11 +4,12 @@ import { useEffect, useRef, useState } from 'react';
 import rough from 'roughjs';
 import { useHistory } from '../hooks/useHistory';
 import { getSvgPathFromStroke, tools } from '../utils';
+import Toolbar from "./Toolbar";
 
 // generator
 const generator = rough.generator();
 
-const Canvas = ({ selectedTool }) => {
+const Canvas = ({ selectedTool, setSelectedTool }) => {
   // console.log("canvas selectedTool: ", selectedTool)
   const canvasRef = useRef(null);
   const [canvasState, setCanvasState, undo, redo] = useHistory([]);
@@ -191,22 +192,24 @@ const Canvas = ({ selectedTool }) => {
   };
 
   return (
-    /**
-     * when drawing on canvas primarily 3 things will happen: (handle this 3 events as first step for drawing lines and rectangles then scale for other shapes)
-     * 1. you pres the mouse button on the canvas
-     * 2. you start moving the mouse
-     * 3. and you stop the mouse and release the mouse button
-     * */
-
-    // Learning: width and height you have to provide specifically to canvas else it will take default width and height
-    <canvas
-      ref={canvasRef}
-      width={'1000px'}
-      height={'500px'}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onMouseMove={handleMouseMove}
-      className=" bg-white shadow-md box-border "></canvas>
+    <>
+      <Toolbar selectedTool={selectedTool} setSelectedTool={setSelectedTool} undo={undo} redo={redo}  />
+      {/**
+       *   when drawing on canvas primarily 3 things will happen: (handle this 3 events as first
+      step for drawing lines and rectangles then scale for other shapes)  
+      * 1. you pres the mouse button on the canvas 
+      * 2. you start moving the mouse * 3. and you stop the mouse and release the mouse button
+      
+      {/* Learning: width and height you have to provide specifically to canvas else it will take default width and height */}
+      <canvas
+        ref={canvasRef}
+        width={'1000px'}
+        height={'500px'}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+        className=" bg-white shadow-md box-border "></canvas>
+    </>
   );
 };
 

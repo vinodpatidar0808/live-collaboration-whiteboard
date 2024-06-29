@@ -1,10 +1,8 @@
-import { useState } from "react"
-import Canvas from './../components/Canvas';
+import { useState } from 'react';
 /**
  * This hook is used to maintain the history of the canvas and this will be used to undo and redo the canvas.
- * 
+ *
  */
-
 
 export const useHistory = (canvasStartState) => {
   // this currentStage will help us navigate the history stack
@@ -18,24 +16,24 @@ export const useHistory = (canvasStartState) => {
     // console.log("CanvasStates: ", canvasStates)
     // console.log("updateCanvasState: ", newValue)
     // put condition for the cases when you update state using state setter function-> caused problem in createElement
-    const tempValue = typeof newValue === "function" ? newValue(canvasStates[currentStage]) : newValue;
+    const tempValue =
+      typeof newValue === 'function' ? newValue(canvasStates[currentStage]) : newValue;
 
-        if (overwrite) {
-          const canvasCopy = [...canvasStates];
-          canvasCopy[currentStage] = tempValue;
-          setCanvasStates(canvasCopy);
-        } else {
-          const updatedState = [...canvasStates].slice(0, currentStage + 1);
-          setCanvasStates([...updatedState, tempValue]);
-          setCurrentStage((curr) => curr + 1);
-        }
-  }
+    if (overwrite) {
+      const canvasCopy = [...canvasStates];
+      canvasCopy[currentStage] = tempValue;
+      setCanvasStates(canvasCopy);
+    } else {
+      const updatedState = [...canvasStates].slice(0, currentStage + 1);
+      setCanvasStates([...updatedState, tempValue]);
+      setCurrentStage((curr) => curr + 1);
+    }
+  };
 
   // currentStage > 0 -> undo only when canvas is not starting stage (empty canvas)
-  const undo = () => currentStage>0 && setCurrentStage(curr => curr - 1);
-  // currentStage < history.length -1 -> redo only when canvas is not in latest stage 
-  const redo = () => currentStage<history.length-1 && setCurrentStage(curr => curr + 1);
-
+  const undo = () => currentStage > 0 && setCurrentStage((curr) => curr - 1);
+  // currentStage < canvasStates.length -1 -> redo only when canvas is not in latest stage
+  const redo = () => currentStage < canvasStates.length - 1 && setCurrentStage((curr) => curr + 1);
 
   return [canvasStates[currentStage], updateCanvasState, undo, redo];
-}
+};

@@ -1,12 +1,22 @@
 // this is not the way i will use icon in production level project, i will use icons from one family, so that they look consisten, using here different icons to reduce search time and focus more on important stuff.
 import { GoPencil } from 'react-icons/go';
+import { LiaRedoSolid, LiaUndoSolid } from 'react-icons/lia';
 import { LuRectangleHorizontal } from 'react-icons/lu';
 import { PiLineVertical } from 'react-icons/pi';
+
 import { tools } from './../utils';
 
-const Toolbar = ({ setSelectedTool, selectedTool }) => {
+const Toolbar = ({ setSelectedTool, selectedTool, undo, redo }) => {
   const changeDrawingElement = (name) => {
     setSelectedTool(name);
+  };
+
+  const handleUndoRedo = (type) => {
+    if (type === 'undo') {
+      undo();
+    } else {
+      redo();
+    }
   };
 
   return (
@@ -30,8 +40,19 @@ const Toolbar = ({ setSelectedTool, selectedTool }) => {
         onClick={() => {
           changeDrawingElement(tools.pencil);
         }}
-        className={`p-1 hover:bg-blue-100-300 ${selectedTool === tools.pencil ? 'bg-blue-200' : ''}`}>
+        className={`p-1 hover:bg-blue-100 ${selectedTool === tools.pencil ? 'bg-blue-200' : ''}`}>
         <GoPencil />
+      </div>
+
+      <div
+        onClick={() => handleUndoRedo('undo')}
+        className={`p-1 hover:bg-blue-100`}>
+        <LiaUndoSolid />
+      </div>
+      <div
+        onClick={() => handleUndoRedo('redo')}
+        className={`p-1 hover:bg-blue-100`}>
+        <LiaRedoSolid />
       </div>
     </div>
   );
