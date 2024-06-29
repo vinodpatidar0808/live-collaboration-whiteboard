@@ -1,5 +1,5 @@
 // this is not the way i will use icon in production level project, i will use icons from one family, so that they look consisten, using here different icons to reduce search time and focus more on important stuff.
-// import { GoPencil } from 'react-icons/go';
+import { GoPencil } from 'react-icons/go';
 import { LuRectangleHorizontal } from 'react-icons/lu';
 import { PiLineVertical } from 'react-icons/pi';
 import { tools } from './../utils';
@@ -26,13 +26,13 @@ const Toolbar = ({ setSelectedTool, selectedTool }) => {
         <LuRectangleHorizontal />
       </div>
       <div className="border mx-2 border-gray-600"></div>
-      {/* <div
+      <div
         onClick={() => {
           changeDrawingElement(tools.pencil);
         }}
         className={`p-1 hover:bg-blue-100-300 ${selectedTool === tools.pencil ? 'bg-blue-200' : ''}`}>
         <GoPencil />
-      </div> */}
+      </div>
     </div>
   );
 };

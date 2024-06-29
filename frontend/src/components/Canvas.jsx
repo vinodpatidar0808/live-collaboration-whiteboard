@@ -1,13 +1,15 @@
 /* eslint-disable react/prop-types */
+import getStroke from 'perfect-freehand';
 import { useEffect, useRef, useState } from 'react';
 import rough from 'roughjs';
 import { useHistory } from '../hooks/useHistory';
-import { tools } from '../utils';
+import { getSvgPathFromStroke, tools } from '../utils';
 
 // generator
 const generator = rough.generator();
 
 const Canvas = ({ selectedTool }) => {
+  // console.log("canvas selectedTool: ", selectedTool)
   const canvasRef = useRef(null);
   const [canvasState, setCanvasState, undo, redo] = useHistory([]);
   const canvasCoordinatesRef = useRef({});
@@ -66,7 +68,14 @@ const Canvas = ({ selectedTool }) => {
   }, []);
 
   const drawElement = (rc, context, element) => {
-    rc.draw(element.rcElement);
+    if (element.tool === tools.pencil) {
+      const outlinePoints = getStroke(element.points);
+      const pathData = getSvgPathFromStroke(outlinePoints);
+      const myPath = new Path2D(pathData);
+      context.fill(myPath);
+    } else {
+      rc.draw(element.rcElement);
+    }
   };
 
   const createElement = (id, tool, x1, y1, x2, y2) => {
@@ -79,8 +88,14 @@ const Canvas = ({ selectedTool }) => {
       // generator.rectangle(x1, y1, width, height, height))
       return { id, tool, x1, y1, x2, y2, rcElement: generator.rectangle(x1, y1, x2 - x1, y2 - y1) };
     }
+
+    // for free drawing we will store all data points from where the mouse passes as provided here: https://www.npmjs.com/package/perfect-freehand
+    if (tool === tools.pencil) {
+      return { id, tool, points: [[x1, y1]] };
+    }
   };
 
+  // helper function: when you release the mouse button, this will update the coordinate for line and rectangle type elements if you move towards -x or -y from starting point.
   const adjustElementCoordinates = (element) => {
     const { type, x1, y1, x2, y2 } = element;
     if (type === 'rectangle') {
@@ -109,7 +124,11 @@ const Canvas = ({ selectedTool }) => {
   // helper function: this will update the shape, coordinate and type of current element we are drawing.
   const updateElement = (id, tool, x1, y1, x2, y2) => {
     const tempCanvasState = [...canvasState];
-    tempCanvasState[id] = createElement(id, tool, x1, y1, x2, y2);
+    if (tool === tools.pencil) {
+      tempCanvasState[id].points = [...tempCanvasState[id].points, [x2, y2]];
+    } else {
+      tempCanvasState[id] = createElement(id, tool, x1, y1, x2, y2);
+    }
     setCanvasState(tempCanvasState, true);
   };
 
@@ -160,11 +179,14 @@ const Canvas = ({ selectedTool }) => {
   };
 
   const handleMouseUp = (e) => {
-    // console.log("mouse button released inside canvas",e)
     const index = selectedElement.id;
     const { id, tool } = canvasState[index];
-    const { x1, y1, x2, y2 } = adjustElementCoordinates(canvasState[index]);
-    updateElement(id, tool, x1, y1, x2, y2);
+
+    // this readjustment we only need for rectangles and lines not paths
+    if (tool === tools.rectangle || tool === tools.line) {
+      const { x1, y1, x2, y2 } = adjustElementCoordinates(canvasState[index]);
+      updateElement(id, tool, x1, y1, x2, y2);
+    }
     setSelectedElement(null);
   };
 
@@ -179,8 +201,8 @@ const Canvas = ({ selectedTool }) => {
     // Learning: width and height you have to provide specifically to canvas else it will take default width and height
     <canvas
       ref={canvasRef}
-      width={"1000px"}
-      height={"500px"}
+      width={'1000px'}
+      height={'500px'}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
