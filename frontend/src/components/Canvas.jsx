@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import rough from 'roughjs';
 import { useHistory } from '../hooks/useHistory';
 import { getSvgPathFromStroke, tools } from '../utils';
-import Toolbar from "./Toolbar";
+import Toolbar from './Toolbar';
+import Collaborate from "./Collaborate";
+import useSocket from "../hooks/useSocket";
 
 // generator
 const generator = rough.generator();
@@ -14,6 +16,10 @@ const Canvas = ({ selectedTool, setSelectedTool }) => {
   const canvasRef = useRef(null);
   const [canvasState, setCanvasState, undo, redo] = useHistory([]);
   const canvasCoordinatesRef = useRef({});
+  const [sessionId, setSessionId] = useState(null);
+
+  const socket = useSocket(sessionId, canvasState);
+
   // selectedElement will hold current element you are working with, this is introduced to loose connecttion when you release mouse button
   const [selectedElement, setSelectedElement] = useState(null);
 
@@ -131,6 +137,9 @@ const Canvas = ({ selectedTool, setSelectedTool }) => {
       tempCanvasState[id] = createElement(id, tool, x1, y1, x2, y2);
     }
     setCanvasState(tempCanvasState, true);
+    if(sessionId){
+      socket.send(JSON.stringify({name: 'vinod', sessionId: sessionId, date: new Date(), canvasState: tempCanvasState}))
+    }
   };
 
   const handleMouseDown = (e) => {
@@ -193,7 +202,12 @@ const Canvas = ({ selectedTool, setSelectedTool }) => {
 
   return (
     <>
-      <Toolbar selectedTool={selectedTool} setSelectedTool={setSelectedTool} undo={undo} redo={redo}  />
+      <Toolbar
+        selectedTool={selectedTool}
+        setSelectedTool={setSelectedTool}
+        undo={undo}
+        redo={redo}
+      />
       {/**
        *   when drawing on canvas primarily 3 things will happen: (handle this 3 events as first
       step for drawing lines and rectangles then scale for other shapes)  
@@ -209,6 +223,7 @@ const Canvas = ({ selectedTool, setSelectedTool }) => {
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
         className=" bg-white shadow-md box-border "></canvas>
+      <Collaborate setSessionId={setSessionId} />
     </>
   );
 };

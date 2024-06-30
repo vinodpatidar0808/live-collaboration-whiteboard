@@ -20,9 +20,9 @@ const Toolbar = ({ setSelectedTool, selectedTool, undo, redo }) => {
   };
 
   return (
-    <div className="flex overflow-hidden  border border-gray-800 rounded-md shadow-md ">
+    <div className="flex  border border-gray-800 rounded-md shadow-md ">
       <div
-        className={`py-1 px-2 border-r-2 border-gray-500 hover:bg-blue-100  ${
+        className={`py-1 px-2 rounded-s-md border-r-2 border-gray-500 hover:bg-blue-100  ${
           selectedTool === tools.line ? 'bg-blue-200' : ''
         }`}
         onClick={() => {
@@ -55,7 +55,7 @@ const Toolbar = ({ setSelectedTool, selectedTool, undo, redo }) => {
       </div>
       <div
         onClick={() => handleUndoRedo('redo')}
-        className={`py-1 px-2  hover:bg-blue-100`}>
+        className={`py-1 px-2 rounded-e-md  hover:bg-blue-100`}>
         <LiaRedoSolid />
       </div>
     </div>

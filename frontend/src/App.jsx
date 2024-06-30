@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import Canvas from "./components/Canvas"
-import Toolbar from "./components/Toolbar";
 
 // styles
 import './App.css'
