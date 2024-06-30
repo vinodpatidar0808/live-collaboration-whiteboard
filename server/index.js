@@ -1,10 +1,10 @@
 const express = require('express');
 const ws = require('ws');
+require("dotenv").config();
 
 const app = express();
 
 const port = process.env.PORT || 8080;
-
 
 const httpServer = app.listen(port, () => {
   console.log(`Server running on port ${port}`);
