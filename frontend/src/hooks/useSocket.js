@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react';
-import { sendDataToServer } from "../utils";
+import { sendDataToServer } from '../utils';
 
 const useSocket = (isCollaborating, canvasState, setSharedCanvas, setLoading) => {
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+  const socketURL = import.meta.env.VITE_API_SOCKET_URL;
   const [socket, setSocket] = useState(null);
+  console.log('socketURL: ', socketURL);
 
   useEffect(() => {
     if (!isCollaborating.collab) {
       socket ? socket.close() : null;
       return;
     }
-    // TODO: replace connection url
     setLoading(true);
-    const newSocket = new WebSocket(apiBaseUrl);
+    const newSocket = new WebSocket(socketURL);
     newSocket.onopen = () => {
       setLoading(false);
       console.log('Connection established');
