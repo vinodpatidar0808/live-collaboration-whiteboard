@@ -16,13 +16,16 @@ const Board = ({ selectedTool, setSelectedTool }) => {
   const [canvasState, setCanvasState, undo, redo] = useHistory([]);
   const canvasCoordinatesRef = useRef({});
   const [sessionId, setSessionId] = useState('');
+  const [loading, setLoading] = useState(false);
   const [isCollaborating, setIsCollaborating] = useState({
     collab: false,
     userDetail: { name: '', sessionId: '', isOwner: false },
   });
 
-  const socket = useSocket(isCollaborating, canvasState);
+  console.log("canvasState: ", canvasState)
 
+  const socket = useSocket(isCollaborating, canvasState, setCanvasState, setLoading);
+  // console.log("loading: ", loading)
   // selectedElement will hold current element you are working with, this is introduced to loose connecttion when you release mouse button
   const [selectedElement, setSelectedElement] = useState(null);
 
@@ -55,7 +58,8 @@ const Board = ({ selectedTool, setSelectedTool }) => {
 
       // drawElement(rc, context);
       // startDrawing based on tool selected
-      canvasState.forEach((shape) => {
+      console.log("canvasState: in effect ", canvasState)
+      canvasState?.forEach((shape) => {
         drawElement(rc, context, shape);
       });
       // restores the most recently saved canvas state by popping the top entry in the drawing state stack.
@@ -140,15 +144,16 @@ const Board = ({ selectedTool, setSelectedTool }) => {
       tempCanvasState[id] = createElement(id, tool, x1, y1, x2, y2);
     }
     setCanvasState(tempCanvasState, true);
-    if (sessionId) {
-      socket.send(
-        JSON.stringify({
-          name: 'vinod',
-          sessionId: sessionId,
-          date: new Date(),
+    if (isCollaborating.collab && socket) {
+      const data = {
+        message: {
+          sessionId: isCollaborating.userDetail.sessionId,
+          name: isCollaborating.userDetail.name,
           canvasState: tempCanvasState,
-        })
-      );
+          isOwner: isCollaborating.userDetail.isOwner,
+        },
+      };
+      socket.send(JSON.stringify(data));
     }
   };
 

@@ -12,9 +12,9 @@ export const useHistory = (canvasStartState) => {
 
   // overwrite = true -> overwrite current element/shape this will be used when you are moving mouse
   const updateCanvasState = (newValue, overwrite = false) => {
-    // console.log("typeof newValue: ", typeof newValue, newValue)
+    console.log("typeof newValue: ", typeof newValue, newValue)
     // console.log("CanvasStates: ", canvasStates)
-    // console.log("updateCanvasState: ", newValue)
+    console.log("updateCanvasState: ", newValue)
     // put condition for the cases when you update state using state setter function-> caused problem in createElement
     const tempValue =
       typeof newValue === 'function' ? newValue(canvasStates[currentStage]) : newValue;

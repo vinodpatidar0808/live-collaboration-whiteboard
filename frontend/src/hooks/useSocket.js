@@ -1,6 +1,6 @@
 import {useState, useEffect } from 'react';
 
-const useSocket = (isCollaborating, canvasState) => {
+const useSocket = (isCollaborating, canvasState, setCanvasState, setLoading) => {
   const [socket, setSocket] = useState(null);
  
   useEffect(() => {
@@ -9,8 +9,10 @@ const useSocket = (isCollaborating, canvasState) => {
       return;
     };
     // TODO: replace connection url
+    setLoading(true);
     const newSocket = new WebSocket('ws://localhost:8080');
     newSocket.onopen = () => {
+      setLoading(false)
       console.log('Connection established');
       const data = {
         message:{
@@ -23,13 +25,22 @@ const useSocket = (isCollaborating, canvasState) => {
       newSocket.send(JSON.stringify(data));
     };
     newSocket.onmessage = (message) => {
-      console.log('Message received:', message.data);
       // update canvasState 
-      
+      console.log("message: ", message)
+      // const parseMessage = JSON.parse(message)
+      // console.log('parseMessage: ', parseMessage);
+      const data = JSON.parse(message.data).message
+      console.log("data: ", data)
+
+
+      if(data?.canvasState){
+        console.log("calling canvas update: ")
+        setCanvasState(data.canvasState, true);
+      }
     };
     setSocket(newSocket);
     return () => newSocket.close();
-  }, [JSON.stringify(isCollaborating), JSON.stringify(canvasState)]);
+  }, [JSON.stringify(isCollaborating)]);
 
   return socket;
 };

@@ -12,6 +12,7 @@ const httpServer = app.listen(port, () => {
 
 const wss = new ws.WebSocketServer({server: httpServer});
 const rooms = {};
+const canvasState = {};
 
 wss.on('connection', function connection(ws){
   console.log("a client connected");
@@ -25,12 +26,15 @@ wss.on('connection', function connection(ws){
       // if room exist, store the information of joined client
       if(rooms[parsedData.sessionId]){
         rooms[parsedData.sessionId][parsedData.name] = {name:parsedData.name, owner: parsedData.isOwner};
+        canvasState[parsedData.sessionId] = parsedData.canvasState;
       }else{
         // create new room and store the information of owner
         rooms[parsedData.sessionId] = {[parsedData.name]:{name:parsedData.name, owner: parsedData.isOwner}};
+        canvasState[parsedData.sessionId] = parsedData.canvasState;
       }
 
       console.log("rooms: ", rooms)
+      console.log('canvasState:', canvasState)
       if (client !== ws && client.readyState === ws.OPEN) {
         client.send(data, {binary: isBinary});
       }
