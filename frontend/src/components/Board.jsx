@@ -14,6 +14,7 @@ const generator = rough.generator();
 const Board = ({ selectedTool, setSelectedTool }) => {
   const canvasRef = useRef(null);
   const [canvasState, setCanvasState, undo, redo] = useHistory([]);
+  const [sharedCanvas, setSharedCanvas] = useState([]);
   const canvasCoordinatesRef = useRef({});
   const [sessionId, setSessionId] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,15 +23,23 @@ const Board = ({ selectedTool, setSelectedTool }) => {
     userDetail: { name: '', sessionId: '', isOwner: false },
   });
 
-  console.log("canvasState: ", canvasState)
+  console.log('canvasState: ', canvasState);
+  console.log('sharedCanvas: ', sharedCanvas);
 
-  const socket = useSocket(isCollaborating, canvasState, setCanvasState, setLoading);
+  const socket = useSocket(
+    isCollaborating,
+    canvasState,
+    setCanvasState,
+    setSharedCanvas,
+    setLoading
+  );
   // console.log("loading: ", loading)
   // selectedElement will hold current element you are working with, this is introduced to loose connecttion when you release mouse button
   const [selectedElement, setSelectedElement] = useState(null);
 
   // TODO: remove console.logs once testing done.
   useEffect(() => {
+    console.log('useEffect Running: ', canvasState);
     const canvas = canvasRef.current;
     if (canvas) {
       const { x, y, left, right, top, bottom } = canvas.getBoundingClientRect();
@@ -58,14 +67,24 @@ const Board = ({ selectedTool, setSelectedTool }) => {
 
       // drawElement(rc, context);
       // startDrawing based on tool selected
-      console.log("canvasState: in effect ", canvasState)
+      console.log('canvasState: in effect ', canvasState);
+
       canvasState?.forEach((shape) => {
         drawElement(rc, context, shape);
       });
+
+      // draw shared canvas
+      sharedCanvas?.forEach((item) => {
+        console.log('item: ', item);
+        item?.canvasState?.forEach((shape) => {
+          drawElement(rc, context, shape);
+        });
+      });
+
       // restores the most recently saved canvas state by popping the top entry in the drawing state stack.
       context.restore();
     }
-  }, [canvasState, selectedElement]);
+  }, [canvasState, selectedElement, sharedCanvas]);
 
   useEffect(() => {
     const undoRedo = (e) => {
@@ -80,6 +99,21 @@ const Board = ({ selectedTool, setSelectedTool }) => {
 
     return () => document.removeEventListener('keydown', undoRedo);
   }, []);
+
+  // useEffect(() => {
+  //   if (isCollaborating.collab && socket) {
+  //     const data = {
+  //       message: {
+  //         sessionId: isCollaborating.userDetail.sessionId,
+  //         name: isCollaborating.userDetail.name,
+  //         canvasState: canvasState,
+  //         isOwner: isCollaborating.userDetail.isOwner,
+  //       },
+  //     };
+  //     console.log("data sending: ", data)
+  //     socket.send(JSON.stringify(data));
+  //   }
+  // }, [JSON.stringify(canvasState)]);
 
   const drawElement = (rc, context, element) => {
     if (element.tool === tools.pencil) {

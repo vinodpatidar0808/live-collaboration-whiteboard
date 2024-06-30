@@ -18,13 +18,17 @@ export const useHistory = (canvasStartState) => {
     // put condition for the cases when you update state using state setter function-> caused problem in createElement
     const tempValue =
       typeof newValue === 'function' ? newValue(canvasStates[currentStage]) : newValue;
-
+      console.log("tempvalue: ", tempValue)
     if (overwrite) {
+      console.log("overwrite: ", overwrite)
       const canvasCopy = [...canvasStates];
+      console.log("canvasCopy: ", canvasCopy)
       canvasCopy[currentStage] = tempValue;
+      console.log("canvasCopy:, currentStage ", canvasCopy, currentStage);
       setCanvasStates(canvasCopy);
     } else {
       const updatedState = [...canvasStates].slice(0, currentStage + 1);
+      console.log("updatedState: ", updatedState);
       setCanvasStates([...updatedState, tempValue]);
       setCurrentStage((curr) => curr + 1);
     }
