@@ -4,7 +4,6 @@ import { sendDataToServer } from '../utils';
 const useSocket = (isCollaborating, canvasState, setSharedCanvas, setLoading) => {
   const socketURL = import.meta.env.VITE_API_SOCKET_URL;
   const [socket, setSocket] = useState(null);
-  console.log('socketURL: ', socketURL);
 
   useEffect(() => {
     if (!isCollaborating.collab) {
