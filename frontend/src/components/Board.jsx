@@ -3,22 +3,28 @@ import getStroke from 'perfect-freehand';
 import { useEffect, useRef, useState } from 'react';
 import rough from 'roughjs';
 import { useHistory } from '../hooks/useHistory';
+import useSocket from '../hooks/useSocket';
 import { getSvgPathFromStroke, tools } from '../utils';
+import Collaborate from './Collaborate';
 import Toolbar from './Toolbar';
-import Collaborate from "./Collaborate";
-import useSocket from "../hooks/useSocket";
 
 // generator
 const generator = rough.generator();
 
-const Canvas = ({ selectedTool, setSelectedTool }) => {
-  // console.log("canvas selectedTool: ", selectedTool)
+const Board = ({ selectedTool, setSelectedTool }) => {
   const canvasRef = useRef(null);
   const [canvasState, setCanvasState, undo, redo] = useHistory([]);
   const canvasCoordinatesRef = useRef({});
-  const [sessionId, setSessionId] = useState(null);
+  const [sessionId, setSessionId] = useState('');
+  const [isCollaborating, setIsCollaborating] = useState({
+    collab: false,
+    userDetail: { name: '', sessionId: '', isOwner: false },
+  });
 
-  const socket = useSocket(sessionId, canvasState);
+  const socket = useSocket(isCollaborating, canvasState);
+
+  console.log("socket: ", socket);
+  console.log("isCollaborating: ", isCollaborating);
 
   // selectedElement will hold current element you are working with, this is introduced to loose connecttion when you release mouse button
   const [selectedElement, setSelectedElement] = useState(null);
@@ -137,8 +143,15 @@ const Canvas = ({ selectedTool, setSelectedTool }) => {
       tempCanvasState[id] = createElement(id, tool, x1, y1, x2, y2);
     }
     setCanvasState(tempCanvasState, true);
-    if(sessionId){
-      socket.send(JSON.stringify({name: 'vinod', sessionId: sessionId, date: new Date(), canvasState: tempCanvasState}))
+    if (sessionId) {
+      socket.send(
+        JSON.stringify({
+          name: 'vinod',
+          sessionId: sessionId,
+          date: new Date(),
+          canvasState: tempCanvasState,
+        })
+      );
     }
   };
 
@@ -223,9 +236,15 @@ const Canvas = ({ selectedTool, setSelectedTool }) => {
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
         className=" bg-white shadow-md box-border "></canvas>
-      <Collaborate setSessionId={setSessionId} />
+
+      <Collaborate
+        setSessionId={setSessionId}
+        sessionId={sessionId}
+        isCollaborating={isCollaborating}
+        setIsCollaborating={setIsCollaborating}
+      />
     </>
   );
 };
 
-export default Canvas;
+export default Board;

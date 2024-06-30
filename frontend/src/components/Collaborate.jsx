@@ -1,33 +1,32 @@
-import { useState, useEffect } from 'react';
-import {createPortal} from "react-dom";
+import {  useState } from 'react';
+import { createPortal } from 'react-dom';
+import Modal from "./Modal";
 
-const Collaborate = ({setSessionId}) => {
-  const [showModal, setShowModal] = useState(false);
 
-  const handleBoardShare = () => {
-    console.log("sharing board.")
-    setSessionId("firstboard-sharing");
+const Collaborate = ({ sessionId, setSessionId, isCollaborating, setIsCollaborating }) => {
+  const [showModal, setShowModal] = useState({open: false, type: ''});
+
+  const handleBoardShare = (type) => {
+    if(type === 'startSession') {
+      setShowModal({open: true, type: 'startSession'});
+    }else{
+      setShowModal({open: true, type: 'joinSession'});
+    }
   };
-
-  const Modal = () => {
-    return (
-      <div>show modal</div>
-    )
-  }
 
   return (
     <>
       <div>
         <button
-          onClick={handleBoardShare}
-          className="text-md px-3 py-2 border bg-blue-400 rounded-md absolute top-24 right-10 ">
+          onClick={() => handleBoardShare("startSession")}
+          className="text-md px-3 py-2 bg-blue-400 rounded-md shadow-md absolute top-24 right-10 ">
           Share board
         </button>
+        <button onClick={()=>handleBoardShare("joinSession")} className="text-md px-3 py-2 bg-blue-400 rounded-md shadow-md absolute top-44 right-10 ">
+          Join session
+        </button>
       </div>
-      {showModal && (createPortal(
-        <Modal />,
-        document.body
-      )) }
+      {showModal.open && createPortal(<Modal showModal={showModal} setShowModal={setShowModal} sessionId={sessionId} setSessionId={setSessionId} isCollaborating={isCollaborating} setIsCollaborating={setIsCollaborating} />, document.body)}
     </>
   );
 };
