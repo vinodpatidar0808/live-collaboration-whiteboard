@@ -37,3 +37,18 @@ export function getSvgPathFromStroke(points, closed = true) {
 
   return result;
 }
+
+
+export const sendDataToServer = (socket, isCollaborating, canvasState ) => {
+  if (isCollaborating.collab && socket) {
+    const data = {
+      message: {
+        sessionId: isCollaborating.userDetail.sessionId,
+        name: isCollaborating.userDetail.name,
+        canvasState: canvasState,
+        isOwner: isCollaborating.userDetail.isOwner,
+      },
+    };
+    socket.send(JSON.stringify(data));
+  }
+}

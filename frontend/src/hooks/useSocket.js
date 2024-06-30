@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { sendDataToServer } from "../utils";
 
 const useSocket = (isCollaborating, canvasState, setCanvasState, setSharedCanvas, setLoading) => {
   const [socket, setSocket] = useState(null);
@@ -14,28 +15,15 @@ const useSocket = (isCollaborating, canvasState, setCanvasState, setSharedCanvas
     newSocket.onopen = () => {
       setLoading(false);
       console.log('Connection established');
-      const data = {
-        message: {
-          sessionId: isCollaborating.userDetail.sessionId,
-          name: isCollaborating.userDetail.name,
-          canvasState: canvasState,
-          isOwner: isCollaborating.userDetail.isOwner,
-        },
-      };
-      newSocket.send(JSON.stringify(data));
+      sendDataToServer(newSocket, isCollaborating, canvasState);
     };
     newSocket.onmessage = (message) => {
       // update canvasState
-      console.log('message: ', message);
-      // const parseMessage = JSON.parse(message)
-      // console.log('parseMessage: ', parseMessage);
       const data = JSON.parse(message.data).message;
-      console.log('data: ', data);
 
       if (data?.canvasState) {
-        console.log('calling canvas update: ');
+        // TODO: modify this to support more than one collaborator.
         setSharedCanvas([data]);
-        // setCanvasState(data.canvasState, true);
       }
     };
     setSocket(newSocket);

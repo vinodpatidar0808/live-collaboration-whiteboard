@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import rough from 'roughjs';
 import { useHistory } from '../hooks/useHistory';
 import useSocket from '../hooks/useSocket';
-import { getSvgPathFromStroke, tools } from '../utils';
+import { getSvgPathFromStroke, sendDataToServer, tools } from '../utils';
 import Collaborate from './Collaborate';
 import Toolbar from './Toolbar';
 
@@ -23,9 +23,6 @@ const Board = ({ selectedTool, setSelectedTool }) => {
     userDetail: { name: '', sessionId: '', isOwner: false },
   });
 
-  console.log('canvasState: ', canvasState);
-  console.log('sharedCanvas: ', sharedCanvas);
-
   const socket = useSocket(
     isCollaborating,
     canvasState,
@@ -39,7 +36,6 @@ const Board = ({ selectedTool, setSelectedTool }) => {
 
   // TODO: remove console.logs once testing done.
   useEffect(() => {
-    console.log('useEffect Running: ', canvasState);
     const canvas = canvasRef.current;
     if (canvas) {
       const { x, y, left, right, top, bottom } = canvas.getBoundingClientRect();
@@ -100,20 +96,9 @@ const Board = ({ selectedTool, setSelectedTool }) => {
     return () => document.removeEventListener('keydown', undoRedo);
   }, []);
 
-  // useEffect(() => {
-  //   if (isCollaborating.collab && socket) {
-  //     const data = {
-  //       message: {
-  //         sessionId: isCollaborating.userDetail.sessionId,
-  //         name: isCollaborating.userDetail.name,
-  //         canvasState: canvasState,
-  //         isOwner: isCollaborating.userDetail.isOwner,
-  //       },
-  //     };
-  //     console.log("data sending: ", data)
-  //     socket.send(JSON.stringify(data));
-  //   }
-  // }, [JSON.stringify(canvasState)]);
+  useEffect(() => {
+    sendDataToServer(socket, isCollaborating, canvasState);
+  }, [JSON.stringify(canvasState)]);
 
   const drawElement = (rc, context, element) => {
     if (element.tool === tools.pencil) {
@@ -178,17 +163,6 @@ const Board = ({ selectedTool, setSelectedTool }) => {
       tempCanvasState[id] = createElement(id, tool, x1, y1, x2, y2);
     }
     setCanvasState(tempCanvasState, true);
-    if (isCollaborating.collab && socket) {
-      const data = {
-        message: {
-          sessionId: isCollaborating.userDetail.sessionId,
-          name: isCollaborating.userDetail.name,
-          canvasState: tempCanvasState,
-          isOwner: isCollaborating.userDetail.isOwner,
-        },
-      };
-      socket.send(JSON.stringify(data));
-    }
   };
 
   const handleMouseDown = (e) => {
