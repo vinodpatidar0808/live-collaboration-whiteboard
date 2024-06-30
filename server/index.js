@@ -20,15 +20,14 @@ wss.on('connection', function connection(ws){
   // this will send messages to other member when it receives a message from one of the client
   ws.on('message', function message(data, isBinary) {
     wss.clients.forEach(function each(client) {
-      // console.log("client: ", client);
       const parsedData = JSON.parse(data).message;
       console.log("data: ",parsedData);
       // if room exist, store the information of joined client
       if(rooms[parsedData.sessionId]){
-        rooms[parsedData.sessionId][parsedData.clientId] = {name:parsedData.name};
+        rooms[parsedData.sessionId][parsedData.name] = {name:parsedData.name, owner: parsedData.isOwner};
       }else{
         // create new room and store the information of owner
-        rooms[parsedData.sessionId] = {[parsedData.clientId]:{name:parsedData.name}};
+        rooms[parsedData.sessionId] = {[parsedData.name]:{name:parsedData.name, owner: parsedData.isOwner}};
       }
 
       console.log("rooms: ", rooms)
@@ -38,5 +37,4 @@ wss.on('connection', function connection(ws){
     }); 
   })
 
-  // ws.send(JSON.stringify({message: "hello", name: "dummy", state: [[0,0],[0,0],[0,0],[0,0],[0,0]]}));
 })
