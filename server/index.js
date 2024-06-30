@@ -15,14 +15,12 @@ const rooms = {};
 const canvasState = {};
 
 wss.on('connection', function connection(ws){
-  console.log("a client connected");
   ws.on('error', console.error);
 
   // this will send messages to other member when it receives a message from one of the client
   ws.on('message', function message(data, isBinary) {
     wss.clients.forEach(function each(client) {
       const parsedData = JSON.parse(data).message;
-      console.log("data: ",parsedData);
       // if room exist, store the information of joined client
       if(rooms[parsedData.sessionId]){
         rooms[parsedData.sessionId][parsedData.name] = {name:parsedData.name, owner: parsedData.isOwner};
@@ -33,8 +31,6 @@ wss.on('connection', function connection(ws){
         canvasState[parsedData.sessionId] = parsedData.canvasState;
       }
 
-      console.log("rooms: ", rooms)
-      console.log('canvasState:', canvasState)
       if (client !== ws && client.readyState === ws.OPEN) {
         client.send(data, {binary: isBinary});
       }
