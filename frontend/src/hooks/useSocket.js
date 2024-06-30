@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { sendDataToServer } from "../utils";
 
-const useSocket = (isCollaborating, canvasState, setCanvasState, setSharedCanvas, setLoading) => {
+const useSocket = (isCollaborating, canvasState, setSharedCanvas, setLoading) => {
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
@@ -11,7 +12,7 @@ const useSocket = (isCollaborating, canvasState, setCanvasState, setSharedCanvas
     }
     // TODO: replace connection url
     setLoading(true);
-    const newSocket = new WebSocket('ws://localhost:8080');
+    const newSocket = new WebSocket(apiBaseUrl);
     newSocket.onopen = () => {
       setLoading(false);
       console.log('Connection established');
