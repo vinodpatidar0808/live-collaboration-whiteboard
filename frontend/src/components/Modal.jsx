@@ -5,18 +5,16 @@ const Modal = ({ sessionId, setSessionId, showModal, setShowModal, isCollaborati
   const [name, setName] = useState('');
   // const [sessionId, setSessionId] = useState(sessionId || uuidv4());
   useEffect(() => {
-    if (!sessionId) {
+    if (!sessionId && showModal.type === 'startSession') {
       setSessionId(uuidv4());
     }
   }, []);
 
   const startCollaboration = () => {
     // startSession -> user will start a new session
-    if(showModal.type === 'startSession') {
-      setIsCollaborating({collab: true, userDetail: {name: name, sessionId: sessionId, isOwner: true}});
-      setShowModal({open: false, type: ''});
-    }
     // joinSession -> user will join an existing session with given id
+      setIsCollaborating({collab: true, userDetail: {name: name, sessionId: sessionId, isOwner: showModal.type === 'startSession'}});
+      setShowModal({open: false, type: ''});
   };
 
   return (
@@ -25,6 +23,7 @@ const Modal = ({ sessionId, setSessionId, showModal, setShowModal, isCollaborati
         <p className="text-xl ">Live collaboration</p>
         <div className="flex flex-col gap-4">
           <input
+          placeholder="Enter your name"
             type="text"
             value={name}
             className="border-2 rounded-md px-3 py-2"
@@ -32,9 +31,11 @@ const Modal = ({ sessionId, setSessionId, showModal, setShowModal, isCollaborati
           />
 
           <input
+          placeholder="Enter a session Id to join"
             readOnly={showModal.type === 'startSession'}
             type="text"
             value={sessionId}
+            onChange={(e) => setSessionId(e.target.value)}
             className="border-2 rounded-md px-3 py-2"
           />
 

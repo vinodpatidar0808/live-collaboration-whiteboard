@@ -23,9 +23,6 @@ const Board = ({ selectedTool, setSelectedTool }) => {
 
   const socket = useSocket(isCollaborating, canvasState);
 
-  console.log("socket: ", socket);
-  console.log("isCollaborating: ", isCollaborating);
-
   // selectedElement will hold current element you are working with, this is introduced to loose connecttion when you release mouse button
   const [selectedElement, setSelectedElement] = useState(null);
 

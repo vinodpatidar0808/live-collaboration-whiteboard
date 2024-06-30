@@ -24,6 +24,7 @@ const useSocket = (isCollaborating, canvasState) => {
     };
     newSocket.onmessage = (message) => {
       console.log('Message received:', message.data);
+      // update canvasState 
       
     };
     setSocket(newSocket);
